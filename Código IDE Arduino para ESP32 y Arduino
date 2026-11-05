@@ -1,59 +1,77 @@
+```cpp
 #include <OneWire.h>
-#include <Adafruit_NeoPixel.h>
 #include <DallasTemperature.h>
+#include <Adafruit_NeoPixel.h>
 
-#define PIN 2           // WS2812B data pin
-#define ONE_WIRE_BUS 5  // DS18B20 data pin
-#define NUM_LEDS 24     // Number of LEDs
+// Configuración de Pines del Hardware
+#define NEOPIXEL_PIN     2    // Pin de datos para la tira o aro WS2812B
+#define TEMP_SENSOR_PIN  5    // Pin de datos para el sensor DS18B20
+#define TOTAL_LEDS       24   // Cantidad de pixeles conectados
 
-OneWire oneWire(ONE_WIRE_BUS);
-DallasTemperature sensors(&oneWire);
-Adafruit_NeoPixel strip(NUM_LEDS, PIN, NEO_GRB + NEO_KHZ800);
+// Inicialización de componentes e instancias de librerías
+OneWire busOneWire(TEMP_SENSOR_PIN);
+DallasTemperature termometro(&busOneWire);
+Adafruit_NeoPixel panelLeds(TOTAL_LEDS, NEOPIXEL_PIN, NEO_GRB + NEO_KHZ800);
 
-// Temperature Range
-const float MIN_TEMP = -10.0;   // Minimum temperature (°C)
-const float MAX_TEMP =  50.0;   // Maximum temperature (°C)
-float Celcius        =  0;
+// Configuración de rangos térmicos operativos
+const float RANGO_MIN_TEMP = -10.0; 
+const float RANGO_MAX_TEMP =  50.0; 
+float temperaturaActual    =  0.0;
 
-// Pre-computed colors for maximum speed
-const uint32_t _24_PALETTE[24] = {
-    0x0000FF, 0x0128FF, 0x0264FF, 0x03B7FF, // Blue to Cyans 
-    0x04DBFF, 0x04FFAD, 0x00FF55, 0x00FF55, // Cyan to Green
-    0x03FF31, 0x00FF00, 0x00FF00, 0x55FF00, // Green 
-    0xAAFF00, 0xFFFF00, 0xFDFF07, 0xFFC708, // Green to Yellow
-    0xFF8106, 0xFF5500, 0xFF5500, 0xFF2D17, // Yellow to Orange
-    0xFF2D17, 0xFF0000, 0xFF0000, 0xB30000  // Orange to Red 
+// Matriz de color degradado optimizada (Azul -> Verde -> Amarillo -> Rojo)
+const uint32_t DEGRADADO_TERMICO[TOTAL_LEDS] = {
+    0x0000FF, 0x0033FF, 0x0066FF, 0x0099FF, // Tonos Fríos (Azul)
+    0x00CCFF, 0x00FFCC, 0x00FF99, 0x00FF44, // Transición a Templado
+    0x00FF00, 0x33FF00, 0x66FF00, 0x99FF00, // Tonos Estables (Verde)
+    0xCCFF00, 0xFFFF00, 0xFFCC00, 0xFF9900, // Alerta Inicial (Amarillo)
+    0xFF6600, 0xFF3300, 0xFF1100, 0xFF0000, // Niveles Altos (Naranja / Rojo)
+    0xE60000, 0xCC0000, 0x990000, 0x660000  // Máximo Peligro (Rojo Obscuro)
 };
 
-
-void displayRainbowFast( int HowMany ) {
-    for(int i=0; i<HowMany; i++)
-      strip.setPixelColor(i, _24_PALETTE[i % 24]);
-    strip.show();
-};
-
+// Renderiza los colores en los LEDs según la escala alcanzada
+void actualizarEscalaGrafica(int ledsActivos) {
+    for (int i = 0; i < ledsActivos; i++) {
+        panelLeds.setPixelColor(i, DEGRADADO_TERMICO[i % TOTAL_LEDS]);
+    }
+    panelLeds.show();
+}
 
 void setup() {
-    Serial.begin(115200); //turn on serial monitor
-    strip.begin();
-    strip.clear();
-    strip.show();
-    strip.setBrightness(10);
-    sensors.begin();
-};
-
+    Serial.begin(115200); 
+    
+    // Configuración inicial del indicador visual
+    panelLeds.begin();
+    panelLeds.clear();
+    panelLeds.show();
+    panelLeds.setBrightness(15); // Nivel de brillo óptimo para interiores
+    
+    // Arranque del sensor de temperatura
+    termometro.begin();
+}
 
 void loop() {
-    strip.clear();
-    sensors.requestTemperatures(); 
-    Celcius = sensors.getTempCByIndex(0);
-    Serial.print("The Temperature is: ");
-    Serial.println(Celcius);
+    panelLeds.clear();
+    
+    // Captura de datos del sensor
+    termometro.requestTemperatures(); 
+    temperaturaActual = termometro.getTempCByIndex(0);
+    
+    // Envío de telemetría por puerto serial
+    Serial.print("Temperatura: ");
+    Serial.print(temperaturaActual);
+    Serial.println(" C");
       
-    int BAR = map(Celcius, MIN_TEMP, MAX_TEMP, 0, NUM_LEDS);
-    displayRainbowFast(BAR);
-    Serial.print("The Bar Number Is: ");
-    Serial.println(BAR);
+    // Conversión matemática de temperatura a número de LEDs activos
+    int nivelEscala = map(temperaturaActual, RANGO_MIN_TEMP, RANGO_MAX_TEMP, 0, TOTAL_LEDS);
+    
+    // Protección contra desbordamiento de límites térmicos
+    nivelEscala = constrain(nivelEscala, 0, TOTAL_LEDS); 
+    
+    // Actualización de hardware
+    actualizarEscalaGrafica(nivelEscala);
+    
+    Serial.print("LEDs Encendidos: ");
+    Serial.println(nivelEscala);
 
-    delay(500); 
-};
+    delay(500); // Muestreo cada 0.5 segundos para un rendimiento fluido
+}
