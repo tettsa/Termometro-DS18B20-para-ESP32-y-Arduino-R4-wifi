@@ -1,0 +1,76 @@
+#include <OneWire.h>
+#include <DallasTemperature.h>
+#include <Adafruit_NeoPixel.h>
+
+// Configuración de Pines del Hardware
+#define NEOPIXEL_PIN     2    // Pin de datos para la tira o aro WS2812B
+#define TEMP_SENSOR_PIN  5    // Pin de datos para el sensor DS18B20
+#define TOTAL_LEDS       24   // Cantidad de pixeles conectados
+
+// Inicialización de componentes e instancias de librerías
+OneWire busOneWire(TEMP_SENSOR_PIN);
+DallasTemperature termometro(&busOneWire);
+Adafruit_NeoPixel panelLeds(TOTAL_LEDS, NEOPIXEL_PIN, NEO_GRB + NEO_KHZ800);
+
+// Configuración de rangos térmicos operativos
+const float RANGO_MIN_TEMP = -10.0; 
+const float RANGO_MAX_TEMP =  50.0; 
+float temperaturaActual    =  0.0;
+
+// Matriz de color degradado optimizada (Azul -> Verde -> Amarillo -> Rojo)
+const uint32_t DEGRADADO_TERMICO[TOTAL_LEDS] = {
+    0x0000FF, 0x0033FF, 0x0066FF, 0x0099FF, // Tonos Fríos (Azul)
+    0x00CCFF, 0x00FFCC, 0x00FF99, 0x00FF44, // Transición a Templado
+    0x00FF00, 0x33FF00, 0x66FF00, 0x99FF00, // Tonos Estables (Verde)
+    0xCCFF00, 0xFFFF00, 0xFFCC00, 0xFF9900, // Alerta Inicial (Amarillo)
+    0xFF6600, 0xFF3300, 0xFF1100, 0xFF0000, // Niveles Altos (Naranja / Rojo)
+    0xE60000, 0xCC0000, 0x990000, 0x660000  // Máximo Peligro (Rojo Obscuro)
+};
+
+// Renderiza los colores en los LEDs según la escala alcanzada
+void actualizarEscalaGrafica(int ledsActivos) {
+    for (int i = 0; i < ledsActivos; i++) {
+        panelLeds.setPixelColor(i, DEGRADADO_TERMICO[i % TOTAL_LEDS]);
+    }
+    panelLeds.show();
+}
+
+void setup() {
+    Serial.begin(115200); 
+    
+    // Configuración inicial del indicador visual
+    panelLeds.begin();
+    panelLeds.clear();
+    panelLeds.show();
+    panelLeds.setBrightness(15); // Nivel de brillo óptimo para interiores
+    
+    // Arranque del sensor de temperatura
+    termometro.begin();
+}
+
+void loop() {
+    panelLeds.clear();
+    
+    // Captura de datos del sensor
+    termometro.requestTemperatures(); 
+    temperaturaActual = termometro.getTempCByIndex(0);
+    
+    // Envío de telemetría por puerto serial
+    Serial.print("Temperatura: ");
+    Serial.print(temperaturaActual);
+    Serial.println(" C");
+      
+    // Conversión matemática de temperatura a número de LEDs activos
+    int nivelEscala = map(temperaturaActual, RANGO_MIN_TEMP, RANGO_MAX_TEMP, 0, TOTAL_LEDS);
+    
+    // Protección contra desbordamiento de límites térmicos
+    nivelEscala = constrain(nivelEscala, 0, TOTAL_LEDS); 
+    
+    // Actualización de hardware
+    actualizarEscalaGrafica(nivelEscala);
+    
+    Serial.print("LEDs Encendidos: ");
+    Serial.println(nivelEscala);
+
+    delay(500); // Muestreo cada 0.5 segundos para un rendimiento fluido
+}
