@@ -1,3 +1,15 @@
+
+Termómetro con sensor DS18B20 e indicador luminoso con LEDS WS2812 con ESP32 / Arduino UNO R4
+
+Este proyecto está diseñado para crear un termómetro de respuesta inmediata. Transforma las lecturas digitales de temperatura ambiental o de líquidos tomado con el sensor DS18B20 en una barra de luz dinámica con leds neopixel DS18B20 que cambia de color según el calor detectado. Es ideal para tableros industriales, acuarios, servidores o sistemas de domótica.
+
+¿Cómo funciona el código paso a paso?
+
+1. Librerías de Control de Precisión: El sistema utiliza las librerías OneWire y DallasTemperature para comunicarse de manera digital y sin ruido con el sensor DS18B20. Para los efectos de iluminación avanzados, recurre a Adafruit_NeoPixel, permitiendo controlar individualmente cada LED de nuestra tira o aro WS2812B.
+2. Matriz de Color Pre-calculada (DEGRADADO_TERMICO): Para garantizar un rendimiento óptimo tanto en placas ESP32 como en Arduino UNO R4 WiFi, el código no calcula los colores en tiempo real (lo cual consume procesador). En su lugar, utiliza una paleta de 24 colores guardados en memoria que van suavemente desde el azul profundo (frío), pasando por el verde (estable), hasta el rojo intenso (peligro).
+3. Mapeo Inteligente (map): El programa toma el rango operativo configurado (por defecto de -10°C a 50°C) y lo divide proporcionalmente entre la cantidad de tus LEDs (24). Si el sensor detecta una temperatura baja, encenderá pocos LEDs de color azul; si la temperatura sube, la barra crecerá iluminándose en tiempo real hacia los colores cálidos.
+4. Protección constrain: Añadimos un filtro de seguridad industrial. Si la temperatura llega a superar los 50°C o bajar de los -10°C, el software se asegura de no enviar datos erróneos a los LEDs, manteniendo el sistema 100% estable
+
 Diagramas de conexión para realizar un termómetro con el sensor DS18B20, leds Neopixel de 24 bits y una esp32 o un Arduino UNO R4 Wifi. 
 
 Diagrama para ESP32
