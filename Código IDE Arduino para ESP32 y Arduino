@@ -75,3 +75,4 @@ void loop() {
 
     delay(500); // Muestreo cada 0.5 segundos para un rendimiento fluido
 }
+```
