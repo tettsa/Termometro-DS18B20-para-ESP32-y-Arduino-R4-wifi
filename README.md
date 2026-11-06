@@ -21,4 +21,5 @@ Diagrama para Arduino UNO R4 WIFI. Nota: Si usas el Arduino para este proyecto t
 <img width="1512" height="1512" alt="image" src="https://github.com/user-attachments/assets/b8f908ae-6ead-4deb-953f-d65b0a9c8385" />
 
 Listado de piezas para realizar el proyecto:
-1 X [ARDUINO® UNO R4 WIFI](https://tienda.tettsa.gt/producto/arduino-uno-r4-wifi/) o 1 X ESP32 DEVKITC
+1 X [ARDUINO® UNO R4 WIFI](https://tienda.tettsa.gt/producto/arduino-uno-r4-wifi/) o 1 X [ESP32 DEVKITC](https://tienda.tettsa.gt/producto/esp32-devkitc-32e-espressif/)
+
