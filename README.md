@@ -22,4 +22,10 @@ Diagrama para Arduino UNO R4 WIFI. Nota: Si usas el Arduino para este proyecto t
 
 Listado de piezas para realizar el proyecto:
 1 X [ARDUINO® UNO R4 WIFI](https://tienda.tettsa.gt/producto/arduino-uno-r4-wifi/) o 1 X [ESP32 DEVKITC](https://tienda.tettsa.gt/producto/esp32-devkitc-32e-espressif/)
+1 X Sensor [DS18B20](https://tienda.tettsa.gt/producto/sensor-temperatura-ds18b20-sonda-waterproof/)
+1 X Resistencia [4.7K – 1/4W](https://tienda.tettsa.gt/producto/resistencia-de-carbon-r4-7k-ohm-1-4w/)
+1 X metro tira neopixel [WS2812](https://tienda.tettsa.gt/producto/1-metro-tira-led-rgb-ws2812b-60-leds-ip67-waterproof/)
 
+Herramientas complementarias:
+1 X [protoboard 1 galleta](https://tienda.tettsa.gt/producto/protoboard-800-puntos-1-galleta/)
+1 X [Caja de cables](https://tienda.tettsa.gt/producto/cables-protoboard-a-la-medida-140-pcs/)
