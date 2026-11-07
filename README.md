@@ -2,6 +2,8 @@
 Termómetro con sensor DS18B20 e indicador luminoso con LEDS WS2812 con ESP32 / Arduino UNO R4
 
 Este proyecto está diseñado para crear un termómetro de respuesta inmediata. Transforma las lecturas digitales de temperatura ambiental o de líquidos tomado con el sensor DS18B20 en una barra de luz dinámica con leds neopixel DS18B20 que cambia de color según el calor detectado. Es ideal para tableros industriales, acuarios, servidores o sistemas de domótica.
+[![Título de tu video](https://img.youtube.com/vi/VIDEO_ID/0.jpg)](https://www.youtube.com/watch?v=[VIDEO_ID](https://www.youtube.com/watch?v=xs8Nf2DM6ZI))
+
 
 ¿Cómo funciona el código paso a paso?
 
